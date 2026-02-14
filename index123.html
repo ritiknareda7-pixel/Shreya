@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Official Contract: Lavii x Ritik</title>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Dancing+Script:wght@700&family=Poppins:wght@600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <style>
+        body {
+            margin: 0; padding: 0;
+            background: #f0f2f5;
+            font-family: 'Courier Prime', monospace; /* Typewriter font for legal feel */
+            height: 100vh;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            overflow: hidden;
+            touch-action: none; /* Disables scrolling for better signing */
+        }
+
+        /* THE PAPER */
+        .paper {
+            background: #fff;
+            width: 350px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border: 1px solid #d1d1d1;
+            position: relative;
+            transform: rotate(-1deg);
+        }
+        .paper::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+            background: repeating-linear-gradient(45deg, #d9534f, #d9534f 10px, #fff 10px, #fff 20px);
+        }
+
+        h1 { font-size: 1.4rem; text-align: center; text-decoration: underline; margin-bottom: 20px; }
+        
+        .clause { font-size: 0.9rem; color: #333; margin-bottom: 15px; line-height: 1.4; text-align: justify; }
+        .highlight { background: #ffff00; font-weight: bold; }
+
+        /* SIGNATURE AREA */
+        .sig-box {
+            border: 2px dashed #aaa;
+            background: #f9f9f9;
+            margin: 15px 0;
+            position: relative;
+            cursor: crosshair;
+        }
+        canvas { width: 100%; height: 120px; display: block; }
+        
+        .sig-label {
+            position: absolute; bottom: 5px; left: 10px;
+            font-size: 0.7rem; color: #aaa; pointer-events: none;
+        }
+        
+        .clear-btn {
+            position: absolute; top: 5px; right: 5px;
+            font-size: 0.7rem; color: red; cursor: pointer;
+            border: 1px solid red; padding: 2px 5px; border-radius: 3px;
+            background: white;
+        }
+
+        /* BUTTONS */
+        .btn-container { position: relative; height: 60px; margin-top: 10px; }
+
+        button {
+            padding: 10px 25px; font-family: 'Poppins', sans-serif; font-weight: bold;
+            border: none; border-radius: 5px; cursor: pointer;
+            box-shadow: 0 3px 0 rgba(0,0,0,0.1);
+        }
+        
+        #submit-btn { background: #28a745; color: white; width: 100%; font-size: 1rem; }
+        
+        #no-btn {
+            background: #dc3545; color: white; position: absolute;
+            font-size: 0.8rem; padding: 5px 10px;
+            display: none; /* Hidden until she tries to leave */
+        }
+
+        /* STAMP ANIMATION */
+        .stamp {
+            position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%) scale(5);
+            opacity: 0; border: 5px solid #d90429; color: #d90429;
+            font-family: 'Courier Prime', monospace; font-weight: bold; font-size: 3rem;
+            padding: 10px 20px; text-transform: uppercase; border-radius: 10px;
+            pointer-events: none; transform-origin: center;
+        }
+        .stamp-visible { animation: stampDown 0.3s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        @keyframes stampDown { 
+            0% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+            100% { transform: translate(-50%, -50%) rotate(-10deg) scale(1); opacity: 0.8; }
+        }
+
+        /* CONFETTI */
+        .confetti { position: fixed; font-size: 20px; animation: fall 3s linear forwards; }
+        @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+
+    </style>
+</head>
+<body>
+
+    <div class="paper" id="contract-form">
+        <h1>BINDING CONTRACT</h1>
+        
+        <p class="clause">
+            I, <span class="highlight">Lavii</span>, hereby agree to the following terms:
+        </p>
+        <p class="clause">
+            1. I admit that <b>Ritik</b> is my favorite person.<br>
+            2. I will tolerate his annoying jokes forever.<br>
+            3. I cannot trade him for anyone else (No refunds).
+        </p>
+
+        <div class="sig-box">
+            <canvas id="sig-canvas"></canvas>
+            <div class="sig-label">x Sign Here (Finger/Stylus)</div>
+            <div class="clear-btn" onclick="clearPad()">Clear</div>
+        </div>
+
+        <div class="btn-container">
+            <button id="submit-btn" onclick="submitContract()">ACCEPT & SIGN</button>
+            <button id="no-btn" onmouseover="moveNo()" onclick="moveNo()">DECLINE</button>
+        </div>
+    </div>
+
+    <div id="approved-stamp" class="stamp">APPROVED</div>
+
+    <script>
+        // --- SIGNATURE PAD SETUP ---
+        const canvas = document.getElementById('sig-canvas');
+        const signaturePad = new SignaturePad(canvas, {
+            backgroundColor: 'rgba(255, 255, 255, 0)', // Transparent
+            penColor: 'rgb(0, 0, 100)' // Blue ink color
+        });
+
+        // Resize canvas for high DPI screens
+        function resizeCanvas() {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext("2d").scale(ratio, ratio);
+            signaturePad.clear();
+        }
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
+
+        function clearPad() {
+            signaturePad.clear();
+        }
+
+        // --- SUBMIT LOGIC ---
+        function submitContract() {
+            if (signaturePad.isEmpty()) {
+                alert("⚠️ LEGAL ERROR: Signature missing!\nYou cannot accept without signing.");
+            } else {
+                // SUCCESS SCENARIO
+                document.getElementById('submit-btn').style.display = 'none';
+                document.getElementById('no-btn').style.display = 'none';
+                
+                // Play Stamp Sound (Optional)
+                if(navigator.vibrate) navigator.vibrate(200);
+
+                // Show Stamp
+                document.getElementById('approved-stamp').classList.add('stamp-visible');
+                
+                // Confetti Explosion
+                explodeConfetti();
+
+                // Final Alert after delay
+                setTimeout(() => {
+                    alert("✅ Contract Filed Successfully!\nYou are now officially stuck with me.");
+                }, 1500);
+            }
+        }
+
+        // --- ANNOYING NO BUTTON ---
+        // (Appears only if she tries to be smart, but mostly we force the signature)
+        function moveNo() {
+            const btn = document.getElementById('no-btn');
+            const x = Math.random() * (window.innerWidth - 100);
+            const y = Math.random() * (window.innerHeight - 100);
+            btn.style.position = 'fixed';
+            btn.style.left = x + 'px';
+            btn.style.top = y + 'px';
+        }
+
+        function explodeConfetti() {
+            for(let i=0; i<50; i++) {
+                const c = document.createElement('div');
+                c.className = 'confetti';
+                c.innerHTML = Math.random() > 0.5 ? '🍓' : '✍️';
+                c.style.left = Math.random() * 100 + 'vw';
+                c.style.top = '-10vh';
+                c.style.animationDuration = Math.random() * 2 + 2 + 's';
+                document.body.appendChild(c);
+            }
+        }
+    </script>
+</body>
+</html>
